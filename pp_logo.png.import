@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2j1hiiyuxde7"
-path="res://.godot/imported/pp_logo.png-15ecefc3047b61b1bb27f8d12aa7553f.ctex"
+uid="uid://bbgjjea563pbj"
+path="res://.godot/imported/pp_logo.png-183295f8ae2383f641d2e1b975edd781.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/planetary_processing/pp_logo.png"
-dest_files=["res://.godot/imported/pp_logo.png-15ecefc3047b61b1bb27f8d12aa7553f.ctex"]
+source_file="res://addons/planetary_processing_csharp/pp_logo.png"
+dest_files=["res://.godot/imported/pp_logo.png-183295f8ae2383f641d2e1b975edd781.ctex"]
 
 [params]
 
