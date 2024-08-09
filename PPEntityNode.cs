@@ -171,7 +171,7 @@ return {init=init,update=update,message=message}
     {
         if (newEntityId == EntityId)
         {
-            EmitSignal("state_changed", newState);
+            EmitSignal(SignalName.StateChanged, newState);
         } 
     } 
 }
