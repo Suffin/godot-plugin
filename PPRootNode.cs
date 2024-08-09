@@ -10,15 +10,15 @@ using Godot;
 public partial class PPRootNode : Node
 {
     private const string _CSHARPERRORMSG = "C// solution not created. Trigger Project > Tools > C// > Create C// Solution";
-    private static GDScript _ppHTTPClient = GD.Load<GDScript>("res://addons/planetary_processing_csharp/pp_editor_http_client.gd");
-    private static GDScript _utils = GD.Load<GDScript>("res://addons/planetary_processing_csharp/pp_utils.gd");
+    private static GDScript _ppHTTPClient = GD.Load<GDScript>("res://addons/planetary_processing/pp_editor_http_client.gd");
+    private static GDScript _utils = GD.Load<GDScript>("res://addons/planetary_processing/pp_utils.gd");
 
     [Signal]
-	public delegate void EntityStateChangedEventHandler(string entityId, Godot.Collections.Dictionary newState);
+	public delegate void EntityStateChangedEventHandler(string entityId, Godot.Collections.Dictionary<string, Variant> newState);
     [Signal]
-	public delegate void NewPlayerEntityEventHandler(string entityId, Godot.Collections.Dictionary state);
+	public delegate void NewPlayerEntityEventHandler(string entityId, Godot.Collections.Dictionary<string, Variant> state);
     [Signal]
-	public delegate void NewEntityEventHandler(string entityId, Godot.Collections.Dictionary state);
+	public delegate void NewEntityEventHandler(string entityId, Godot.Collections.Dictionary<string, Variant> state);
     [Signal]
 	public delegate void PlayerAuthenticatedEventHandler(string playerUuid);
     [Signal]
@@ -134,7 +134,7 @@ public partial class PPRootNode : Node
         CallDeferred("emit_signal", SignalName.PlayerAuthenticated, _playerUuid);
     }
     
-    public void message(Godot.Collections.Dictionary<string, Variant> msg)
+    public void Message(Godot.Collections.Dictionary<string, Variant> msg)
     {
         _sdkNode.Message(msg);
     }
@@ -327,11 +327,11 @@ public partial class PPRootNode : Node
             
         Godot.Collections.Array entityNodes = _GetEntityNodes();
         
-        Godot.Collections.Array<Godot.Collections.Dictionary> entityInitData = new Godot.Collections.Array<Godot.Collections.Dictionary>();
+        Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> entityInitData = new Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>>();
         foreach (PPEntityNode entityNode in entityNodes)
         {
             Node sceneInstance = entityNode.GetParent();
-            Godot.Collections.Dictionary entityData = new Godot.Collections.Dictionary();
+            Godot.Collections.Dictionary<string, Variant> entityData = new Godot.Collections.Dictionary<string, Variant>();
             if (!string.IsNullOrEmpty(entityNode.Data))
             {
                 Json json = new Json();
@@ -340,7 +340,7 @@ public partial class PPRootNode : Node
                 {
                     throw new Exception($"invalid json found in data field of entity: {sceneInstance.Name}");
                 }
-                entityData = (Godot.Collections.Dictionary)json.Data;
+                entityData = (Godot.Collections.Dictionary<string, Variant>)json.Data;
             }
             
             float originX = 0.0f;
@@ -360,7 +360,7 @@ public partial class PPRootNode : Node
                 originZ = sceneInstanceNode3D.GlobalTransform.Origin.Z;
             }
 
-            entityInitData.Add(new Godot.Collections.Dictionary()
+            entityInitData.Add(new Godot.Collections.Dictionary<string, Variant>()
                 {
                     {"data", entityData},
                     {"chunkloader", entityNode.Chunkloader},

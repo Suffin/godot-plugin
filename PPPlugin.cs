@@ -8,10 +8,10 @@ public partial class PPPlugin : EditorPlugin
 
     public override void _EnterTree()
     {
-        Script ppRootNodeScript = GD.Load<Script>("res://addons/planetary_processing_csharp/PPRootNode.cs");
-        Script ppEntityNode = GD.Load<Script>("res://addons/planetary_processing_csharp/PPEntityNode.cs");
-        AddCustomType("PPRootNode", "Node", ppRootNodeScript, GD.Load<Texture2D>("res://addons/planetary_processing_csharp/pp_logo.png"));
-        AddCustomType("PPEntityNode", "Node", ppEntityNode, GD.Load<Texture2D>("res://addons/planetary_processing_csharp/pp_logo.png"));
+        Script ppRootNodeScript = GD.Load<Script>("res://addons/planetary_processing/PPRootNode.cs");
+        Script ppEntityNode = GD.Load<Script>("res://addons/planetary_processing/PPEntityNode.cs");
+        AddCustomType("PPRootNode", "Node", ppRootNodeScript, GD.Load<Texture2D>("res://addons/planetary_processing/pp_logo.png"));
+        AddCustomType("PPEntityNode", "Node", ppEntityNode, GD.Load<Texture2D>("res://addons/planetary_processing/pp_logo.png"));
         if (Engine.IsEditorHint())
         {
             _inspectorPlugin = new PPInspectorButtonPlugin();

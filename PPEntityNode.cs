@@ -6,10 +6,10 @@ using Godot;
 [Tool]
 public partial class PPEntityNode : Node
 {
-    private static GDScript _utils = GD.Load<GDScript>("res://addons/planetary_processing_csharp/pp_utils.gd");
+    private static GDScript _utils = GD.Load<GDScript>("res://addons/planetary_processing/pp_utils.gd");
 
     [Signal]
-	public delegate void StateChangedEventHandler(Godot.Collections.Dictionary newState);
+	public delegate void StateChangedEventHandler(Godot.Collections.Dictionary<string, Variant> newState);
 
     public string GetSwarmplayRepoDirectory()
     {
@@ -45,9 +45,9 @@ public partial class PPEntityNode : Node
         set { _SetType(value); }
     }
     private string _luaPath = "";
-    private string _entityId = "";
+    public string EntityId = "";
     private PPRootNode _ppRootNode;
-    private bool isInstance;
+    private bool _isInstance;
 
     private void _on_button_pressed(string text)
     {
@@ -83,10 +83,10 @@ return {init=init,update=update,message=message}
             {
                 {"name", "Type"},
                 {"type", (int)Variant.Type.String},
-                {"usage", isInstance ? (int)PropertyUsageFlags.Editor : (int)PropertyUsageFlags.Default}
+                {"usage", _isInstance ? (int)PropertyUsageFlags.Editor : (int)PropertyUsageFlags.Default}
             }
         };
-        if (!isInstance)
+        if (!_isInstance)
         {
             properties.Add(
             new Godot.Collections.Dictionary()
@@ -133,10 +133,10 @@ return {init=init,update=update,message=message}
     public override void _EnterTree()
     {
         string basePath = GetSwarmplayRepoDirectory();
-        isInstance = GetTree().EditedSceneRoot != GetParent();
+        _isInstance = GetTree().EditedSceneRoot != GetParent();
         if (Engine.IsEditorHint())
         {
-            if (!isInstance)
+            if (!_isInstance)
             {
                 if (string.IsNullOrEmpty(Type))
                 {
@@ -167,9 +167,9 @@ return {init=init,update=update,message=message}
         _ppRootNode.EntityStateChanged += _OnEntityStateChange;
     }
 	
-    private void _OnEntityStateChange(string newEntityId, Godot.Collections.Dictionary newState)
+    private void _OnEntityStateChange(string newEntityId, Godot.Collections.Dictionary<string, Variant> newState)
     {
-        if (newEntityId == _entityId)
+        if (newEntityId == EntityId)
         {
             EmitSignal("state_changed", newState);
         } 
