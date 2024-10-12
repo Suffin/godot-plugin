@@ -39,11 +39,6 @@ public partial class PPRootNode : Node
     //public string password = "";
     private bool _loggedIn = false;
     private Godot.Collections.Array<string> _registeredEntities = new Godot.Collections.Array<string>();
-    private string _swarmplayRepoDirectory = "";
-    public string SwarmplayRepoDirectory {
-        get { return _GetSwarmplayRepoDirectory(); }
-        set { _SetSwarmplayRepoDirectory(value); }
-    }
 
     private bool _csprojReferenceExists = false;
     private GodotObject _client = (GodotObject)_ppHTTPClient.New();
@@ -52,30 +47,6 @@ public partial class PPRootNode : Node
     private Godot.Timer _timer;
     private int _timerWaitInS = 10;
     private SDKNode _sdkNode;
-
-    private void _SetSwarmplayRepoDirectory(string newDir)
-    {
-        _swarmplayRepoDirectory = newDir;
-
-        if (Engine.IsEditorHint())
-        {
-            EditorSettings settings = EditorInterface.Singleton.GetEditorSettings();
-            settings.SetSetting("user/swarmplay_repo_directory", newDir);
-        }
-    }
-
-
-    private string _GetSwarmplayRepoDirectory()
-    {
-        if (Engine.IsEditorHint())
-        {
-            EditorSettings settings = EditorInterface.Singleton.GetEditorSettings();
-            Variant dir = settings.GetSetting("user/swarmplay_repo_directory");
-            return dir.ToString();
-        }
-            
-        return _swarmplayRepoDirectory;
-    }  
 
     public override void _Ready()
     {
@@ -196,20 +167,6 @@ public partial class PPRootNode : Node
                 {"type", (int)Variant.Type.String},
                 {"usage", _loggedIn ? (int)PropertyUsageFlags.ReadOnly : (int)PropertyUsageFlags.Default}
             },
-            new Godot.Collections.Dictionary()
-            {
-                {"name", "SwarmplayRepoDirectory"},
-                {"type", (int)Variant.Type.String},
-                {"hint", (int)PropertyHint.Dir},
-                {"usage", (int)PropertyUsageFlags.Default | (int)PropertyUsageFlags.Editor},
-                {"hint_string", ""}
-            },
-            new Godot.Collections.Dictionary()
-            {
-                {"name", "pp_button_generate_init.json"},
-                {"type", (int)Variant.Type.String},
-                {"usage", (int)PropertyUsageFlags.Default}
-            },
         };
         if (!_csprojReferenceExists)
         {
@@ -246,12 +203,6 @@ public partial class PPRootNode : Node
             _OnCsprojButtonPressed();
             return;
         }
-            
-        if (text.ToLower() == "generate init.json")
-        {
-            _OnGenerateInitJsonButtonPressed();
-            return;
-        }   
     }
 
     private void _OnCsprojButtonPressed()
@@ -263,12 +214,6 @@ public partial class PPRootNode : Node
         }
         _utils.Call("add_planetary_csproj_ref", $"res://{csprojFiles[0]}");
         NotifyPropertyListChanged();
-    }
-       
-
-    private void _OnGenerateInitJsonButtonPressed()
-    {
-        _GenerateInitJson();
     }
         
     private Godot.Collections.Array _GetEntityNodes()
@@ -310,72 +255,6 @@ public partial class PPRootNode : Node
             }
             _RecursiveSceneEntityRemoval(child);
         }
-    }
-            
-    private void _GenerateInitJson()
-    {
-        if (SwarmplayRepoDirectory.Trim() == "")
-        {
-            throw new Exception("The SwarmPlay repo directory path is not set.");
-        }
-
-        DirAccess dirAccess = DirAccess.Open(SwarmplayRepoDirectory);
-        if (dirAccess == null)
-        {
-            throw new Exception($"The SwarmPlay repo directory does not exist: {SwarmplayRepoDirectory}");
-        }
-            
-        Godot.Collections.Array entityNodes = _GetEntityNodes();
-        
-        Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> entityInitData = new Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>>();
-        foreach (PPEntityNode entityNode in entityNodes)
-        {
-            Node sceneInstance = entityNode.GetParent();
-            Godot.Collections.Dictionary<string, Variant> entityData = new Godot.Collections.Dictionary<string, Variant>();
-            if (!string.IsNullOrEmpty(entityNode.Data))
-            {
-                Json json = new Json();
-                Error result = json.Parse(entityNode.Data);
-                if (result != Error.Ok)
-                {
-                    throw new Exception($"invalid json found in data field of entity: {sceneInstance.Name}");
-                }
-                entityData = (Godot.Collections.Dictionary<string, Variant>)json.Data;
-            }
-            
-            float originX = 0.0f;
-            float originY = 0.0f;
-            float originZ = 0.0f;
-            if (sceneInstance is Node2D)
-            {
-                Node2D sceneInstanceNode2D = (Node2D)sceneInstance;
-                originX = sceneInstanceNode2D.GlobalTransform.Origin.X;
-                originY = sceneInstanceNode2D.GlobalTransform.Origin.Y;
-            }
-            else if (sceneInstance is Node3D)
-            {
-                Node3D sceneInstanceNode3D = (Node3D)sceneInstance;
-                originX = sceneInstanceNode3D.GlobalTransform.Origin.X;
-                originY = sceneInstanceNode3D.GlobalTransform.Origin.Y;
-                originZ = sceneInstanceNode3D.GlobalTransform.Origin.Z;
-            }
-
-            entityInitData.Add(new Godot.Collections.Dictionary<string, Variant>()
-                {
-                    {"data", entityData},
-                    {"chunkloader", entityNode.Chunkloader},
-                    {"type", entityNode.Type},
-                    {"x", originX},
-                    {"z", originY},
-                    {"y", originZ}
-                }
-            );
-        }
-            
-        string data = Json.Stringify(entityInitData);
-        _utils.Call("write_string_to_file", $"{SwarmplayRepoDirectory}/init.json", data);
-        _utils.Call("refresh_filesystem");
-        GD.Print("init.json generated");
     }
         
     public override void _EnterTree()
