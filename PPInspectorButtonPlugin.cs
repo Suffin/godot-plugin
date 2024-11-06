@@ -1,3 +1,4 @@
+#if TOOLS
 using Godot;
 
 public partial class PPInspectorButtonPlugin : EditorInspectorPlugin
@@ -23,3 +24,4 @@ public partial class PPInspectorButtonPlugin : EditorInspectorPlugin
         return false;
     }     
 }
+#endif
